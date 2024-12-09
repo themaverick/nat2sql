@@ -25,17 +25,17 @@ for i in ques_sql_lis:
 
 
     for j in table_lis:
-        j["db_id"] == db_id
-        struct_db = get_structure_schema(j)
-        sys_dict = {"role": "system", "content": sys_prompt.format(database_schema = struct_db)}
-        user_dict = {"role": "user", "content": ques}
-        asst_dict = {"role": "assistant", "content": sql}
+        if j["db_id"] == db_id:
+            struct_db = get_structure_schema(j)
+            sys_dict = {"role": "system", "content": sys_prompt.format(database_schema = struct_db)}
+            user_dict = {"role": "user", "content": ques}
+            asst_dict = {"role": "assistant", "content": sql}
 
-    data_pt["messages"].append([sys_dict, user_dict, asst_dict])
+            data_pt["messages"].append([sys_dict, user_dict, asst_dict])
 
-    finetune_dataset.append(data_pt)
+            finetune_dataset.append(data_pt)
         
 # print(finetune_dataset)
 
-with open("finetune_dataset", "wb") as fp:
+with open("finetune_dataset2", "wb") as fp:
     pickle.dump(finetune_dataset, fp)

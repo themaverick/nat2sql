@@ -8,22 +8,32 @@ def get_structure_schema(schema_data):
     
     structured_schema = {"db_id": db_id, "tables": {}}
     
+    # To keep track of the column types processed
+    count = 1
+
     # Iterate over each table
     for i, table_name in enumerate(table_names_original):
+        # Extract columns for the current table
+        tab_col_nm = [row[1] for row in column_names_original if row[0] == i]
+        tab_col_al = [row[1] for row in column_names if row[0] == i]
+        
+        # Slice column types based on number of columns for this table
+        tab_col_typ = column_types[count: count + len(tab_col_nm)]
+        count += len(tab_col_nm)
+
         table_alias = table_names[i]
         columns = []
-        
-        # For each column in this table, match original names with alias and types
-        for col_info in zip(column_names_original, column_names, column_types):
+
+        # Collect each column's details (original name, alias, and type)
+        for col_info in zip(tab_col_nm, tab_col_al, tab_col_typ):
             original_col_info, alias_col_info, col_type = col_info
-            if original_col_info[0] == i:  # Check if this column belongs to the current table
-                columns.append({
-                    "original_name": original_col_info[1],
-                    "alias_name": alias_col_info[1],
-                    "type": col_type
-                })
-        
-        # Store the columns for each table
-        structured_schema["tables"][table_alias] = {"columns": columns}
-    
+            columns.append({
+                "original_name": original_col_info,
+                "alias_name": alias_col_info,
+                "type": col_type
+            })
+
+        # Store the columns for this table in the structured schema
+        structured_schema["tables"][table_name] = {"columns": columns}
+
     return structured_schema
